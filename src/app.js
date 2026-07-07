@@ -61,7 +61,10 @@ async function loadItems() {
 }
 
 async function handlePaste(event) {
+    if (event.clipboardShelfHandled) return;
+    event.clipboardShelfHandled = true;
     event.preventDefault();
+    event.stopPropagation();
     try {
         const parsed = await parsePasteEvent(event);
         if (!parsed.length) {
@@ -260,6 +263,7 @@ function searchableText(item) {
 }
 
 window.addEventListener("paste", async (event) => {
+    if (event.defaultPrevented || event.clipboardShelfHandled) return;
     if (document.activeElement?.matches("input, textarea, [contenteditable='true']")) return;
     await handlePaste(event);
 });
