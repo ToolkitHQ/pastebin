@@ -1,4 +1,4 @@
-const DB_NAME = "clipboardShelf";
+const DB_NAME = "pastebin";
 const DB_VERSION = 1;
 const STORE_NAME = "items";
 

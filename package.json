@@ -1,8 +1,8 @@
 {
-    "name": "clipboard-shelf",
+    "name": "pastebin",
     "version": "1.0.0",
     "private": true,
-    "description": "Offline Clipboard Shelf web application using HTML, CSS, vanilla JavaScript, and IndexedDB.",
+    "description": "Offline pastebin web application using HTML, CSS, vanilla JavaScript, and IndexedDB.",
     "scripts": {
         "dev": "live-server src --host=127.0.0.1 --port=4173 --no-browser",
         "start": "npm run dev"

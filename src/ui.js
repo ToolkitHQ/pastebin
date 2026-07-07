@@ -1,4 +1,4 @@
-import { downloadItem, copyItem } from "./clipboard.js";
+import { downloadItem, copyItem } from "./paste.js";
 import { extensionFromName, formatBytes, formatDate, safeAttr, safeText, typeIcon } from "./storage.js";
 
 const elements = {};

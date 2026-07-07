@@ -75,7 +75,7 @@ export async function createItemFromFile(file) {
             content: file,
             preview: file.name || "Image",
             metadata: {
-                fileName: file.name || "clipboard-image.png",
+                fileName: file.name || "pastebin-image.png",
                 size: file.size,
                 width: dimensions.width,
                 height: dimensions.height,
@@ -206,7 +206,7 @@ export function downloadJson(name, data) {
 
 function downloadName(item) {
     if (item.metadata?.fileName) return item.metadata.fileName;
-    const clean = item.title.replace(/[^\w.-]+/g, "-").replace(/^-|-$/g, "").toLowerCase() || "clipboard-item";
+    const clean = item.title.replace(/[^\w.-]+/g, "-").replace(/^-|-$/g, "").toLowerCase() || "pastebin-item";
     const ext = item.type === "html" ? "html" : item.type === "url" ? "url.txt" : "txt";
     return `${clean}.${ext}`;
 }

@@ -8,7 +8,7 @@ import {
     saveItems,
     serializeItems
 } from "./database.js";
-import { createTextItem, downloadJson, parseDroppedFiles, parsePasteEvent } from "./clipboard.js";
+import { createTextItem, downloadJson, parseDroppedFiles, parsePasteEvent } from "./paste.js";
 import { getStorageSummary } from "./storage.js";
 import {
     bindUi,
@@ -39,21 +39,21 @@ const app = {
             onDeleteSelected: deleteSelected,
             onDeleteAll: deleteAll,
             onDuplicate: duplicateItem,
-            onExportAll: () => exportItems(items, "clipboard-shelf-export.json"),
+            onExportAll: () => exportItems(items, "pastebin-export.json"),
             onExportSelected: exportSelected,
             onImport: importFile
         });
 
-        setTheme(localStorage.getItem("clipboardShelfTheme") || "light");
+        setTheme(localStorage.getItem("pastebinTheme") || "light");
         await loadItems();
         refresh();
-        showToast("Clipboard Shelf is ready.");
+        showToast("pastebin is ready.");
     }
 };
 
 app.init().catch((error) => {
     console.error(error);
-    showToast("Clipboard Shelf could not start. IndexedDB may be unavailable.", "error");
+    showToast("pastebin could not start. IndexedDB may be unavailable.", "error");
 });
 
 async function loadItems() {
@@ -61,14 +61,14 @@ async function loadItems() {
 }
 
 async function handlePaste(event) {
-    if (event.clipboardShelfHandled) return;
-    event.clipboardShelfHandled = true;
+    if (event.pastebinHandled) return;
+    event.pastebinHandled = true;
     event.preventDefault();
     event.stopPropagation();
     try {
         const parsed = await parsePasteEvent(event);
         if (!parsed.length) {
-            showToast("Nothing supported was found on the clipboard.", "error");
+            showToast("Nothing supported was found to paste.", "error");
             return;
         }
         await saveItems(parsed);
@@ -133,7 +133,7 @@ async function deleteSelected() {
 
 async function deleteAll() {
     if (!items.length) return;
-    const confirmed = await confirmAction("Delete all items?", "This removes every clipboard item stored in this browser.");
+    const confirmed = await confirmAction("Delete all items?", "This removes every saved item stored in this browser.");
     if (!confirmed) return;
     lastDeleted = [...items];
     await clearItems();
@@ -189,7 +189,7 @@ async function exportItems(itemsToExport, filename) {
         return;
     }
     const data = {
-        app: "Clipboard Shelf",
+        app: "pastebin",
         exportedAt: new Date().toISOString(),
         version: 1,
         items: await serializeItems(itemsToExport)
@@ -200,7 +200,7 @@ async function exportItems(itemsToExport, filename) {
 
 async function exportSelected() {
     const selected = items.filter((item) => selectedIds.has(item.id));
-    await exportItems(selected, "clipboard-shelf-selected.json");
+    await exportItems(selected, "pastebin-selected.json");
 }
 
 async function importFile(file) {
@@ -208,7 +208,7 @@ async function importFile(file) {
     try {
         const parsed = JSON.parse(await file.text());
         const incoming = Array.isArray(parsed) ? parsed : parsed.items;
-        if (!Array.isArray(incoming)) throw new Error("Import file does not contain clipboard items.");
+        if (!Array.isArray(incoming)) throw new Error("Import file does not contain pastebin items.");
         const restored = await deserializeItems(incoming);
         await saveItems(restored);
         items = [...restored, ...items];
@@ -221,7 +221,7 @@ async function importFile(file) {
 
 function toggleTheme() {
     const nextTheme = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
-    localStorage.setItem("clipboardShelfTheme", nextTheme);
+    localStorage.setItem("pastebinTheme", nextTheme);
     setTheme(nextTheme);
 }
 
@@ -263,7 +263,7 @@ function searchableText(item) {
 }
 
 window.addEventListener("paste", async (event) => {
-    if (event.defaultPrevented || event.clipboardShelfHandled) return;
+    if (event.defaultPrevented || event.pastebinHandled) return;
     if (document.activeElement?.matches("input, textarea, [contenteditable='true']")) return;
     await handlePaste(event);
 });
@@ -272,7 +272,7 @@ window.addEventListener("error", (event) => {
     showToast(event.message || "Something went wrong.", "error");
 });
 
-window.ClipboardShelfDebug = {
+window.PastebinDebug = {
     createTextItem,
     get items() {
         return items;
